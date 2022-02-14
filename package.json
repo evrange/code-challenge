@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "luxon": "2"
+  },
+  "devDependencies": {
+    "@types/jest": "27",
+    "@types/luxon": "2",
+    "@types/node": "16",
+    "jest": "27",
+    "ts-jest": "27",
+    "ts-node": "10",
+    "typescript": "4"
+  },
+  "license": "UNLICENSED",
+  "name": "@evrange/code-challenge",
+  "scripts": {
+    "test": "jest --config ./test/jest.config.json"
+  },
+  "version": "0.0.1"
+}
