@@ -4,16 +4,31 @@ import { data, joe } from './mocks';
 
 describe('RegisteredSinceDataProcessor', () => {
 
-  it('returns all records with an added function property that returns the number of days registered', async () => {
-    const results = await new RegisteredSinceDataProcessor(data).process();
+  let joeProcessed: Awaited<ReturnType<RegisteredSinceDataProcessor['process']>>[number];
 
-    const joeMatch = results.find(({ firstName }) => 'Joe' === firstName);
+  beforeAll(async () => {
+    const records = await new RegisteredSinceDataProcessor(data).process();
+    const match = records.find(({ firstName }) => 'Joe' === firstName);
+    if (!match) {
+      throw new Error('Joe not found in processed records');
+    }
+    joeProcessed = match;
+  });
 
-    const dateAfterRegistration = DateTime.fromISO(joe.registered).plus({ days: 10 });
-    expect(await joeMatch?.daysSinceRegistered(dateAfterRegistration)).toBe(10);
+  it('returns a record with a new function property named daysSinceRegistered', async () => {
+    expect(typeof joeProcessed.daysSinceRegistered).toBe('function');
+  });
 
-    const dateBeforeRegistration = DateTime.fromISO(joe.registered).minus({ days: 10 });
-    expect(await joeMatch?.daysSinceRegistered(dateBeforeRegistration)).toBe(0);
+  it('returns a Promise when daysSinceRegistered() is called', async () => {
+    expect(joeProcessed.daysSinceRegistered(DateTime.now())).toBeInstanceOf(Promise);
+  });
+
+  it('returns the correct number of days since registration when date provided is after registration', async () => {
+    expect(await joeProcessed.daysSinceRegistered(DateTime.fromISO(joe.registered).plus({ days: 10 }))).toBe(10);
+  });
+
+  it('returns zero when date provided is before registration', async () => {
+    expect(await joeProcessed.daysSinceRegistered(DateTime.fromISO(joe.registered).minus({ days: 10 }))).toBe(0);
   });
 
 });
